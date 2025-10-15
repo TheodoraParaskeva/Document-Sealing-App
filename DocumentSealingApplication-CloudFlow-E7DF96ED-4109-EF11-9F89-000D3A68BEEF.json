@@ -1,0 +1,1257 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "crm_sharedsharepointonline_6be08"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_office365": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "crm_sharedoffice365_83c40"
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      },
+      "shared_approvals": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "crm_sharedapprovals_5632b"
+        },
+        "api": {
+          "name": "shared_approvals"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "When_an_item_is_created": {
+          "recurrence": {
+            "interval": 1,
+            "frequency": "Minute"
+          },
+          "splitOn": "@triggerOutputs()?['body/value']",
+          "metadata": {
+            "operationMetadataId": "d8b3d350-80c5-42a0-bf57-c6636aa4a686"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetOnNewItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Get_item": {
+          "runAfter": {
+            "Update_item_3": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "69e2a18b-12b7-4846-99bb-5da0dfba30a7"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+              "id": "@triggerOutputs()?['body/ID']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Get_attachments": {
+          "runAfter": {
+            "Get_item": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "521cacc3-b2f8-415c-bf7e-21bb99304800"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItemAttachments",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+              "itemId": "@outputs('Get_item')?['body/ID']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Apply_to_each": {
+          "foreach": "@body('Get_attachments')",
+          "actions": {
+            "Get_attachment_content": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "a853e582-2510-4467-b130-7e09e94f1b07"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetAttachmentContent",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                  "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                  "itemId": "@triggerOutputs()?['body/ID']",
+                  "attachmentId": "@item()?['Id']"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Append_to_array_variable": {
+              "runAfter": {
+                "Get_attachment_content": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "25d3d3a9-73c5-40b1-8a82-e8e73f3f4be5"
+              },
+              "type": "AppendToArrayVariable",
+              "inputs": {
+                "name": "attachmentArray",
+                "value": {
+                  "Name": "@items('Apply_to_each')?['DisplayName']",
+                  "Content": "@body('Get_attachment_content')"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "7d85da29-58c2-4061-9164-5e34f4daa9d7"
+          },
+          "type": "Foreach"
+        },
+        "Terminate": {
+          "runAfter": {
+            "Update_item_-_Sealing_Request_Completed": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "51e37ce1-7244-45c2-90f3-dfbdbd9509cf"
+          },
+          "type": "Terminate",
+          "inputs": {
+            "runStatus": "Succeeded"
+          }
+        },
+        "Initialize_variable": {
+          "runAfter": {
+            "Get_attachments": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f082f763-aa2d-40bc-b288-5a3e8f0ad177"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "attachmentArray",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Condition_-_Business_Leader_Approval": {
+          "actions": {
+            "Apply_to_each_2": {
+              "foreach": "@outputs('Start_and_wait_for_an_approval_(Business_Leader)')?['body/responses']",
+              "actions": {
+                "Update_item": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "2ed2f9a2-75db-44cd-94b4-49bfbce14cdb"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                      "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                      "id": "@triggerOutputs()?['body/ID']",
+                      "item/BusinessLeader/Value": "@items('Apply_to_each_2')?['responder/displayName']",
+                      "item/BusinessLeaderSignatory": "@items('Apply_to_each_2')?['responder/displayName']",
+                      "item/field_10": "@items('Apply_to_each_2')?['comments']",
+                      "item/BusinessLeaderApprovalDate": "@outputs('Start_and_wait_for_an_approval_(Business_Leader)')?['body/completionDate']",
+                      "item/Sign_x002d_off_x0020_status": "Business Leader Approved",
+                      "item/EmergencyRequest_x003f_": false,
+                      "item/Scanning": false,
+                      "item/Courier": false
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                }
+              },
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "eaafe71e-a5a9-49a4-b2d5-c0a22c2d7051"
+              },
+              "type": "Foreach"
+            }
+          },
+          "runAfter": {
+            "Start_and_wait_for_an_approval_(Business_Leader)": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Apply_to_each_4": {
+                "foreach": "@outputs('Start_and_wait_for_an_approval_(Business_Leader)')?['body/responses']",
+                "actions": {
+                  "Update_item_2": {
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "d3dd5755-5ba9-43bf-aef8-dcfd2443ddeb"
+                    },
+                    "type": "OpenApiConnection",
+                    "inputs": {
+                      "host": {
+                        "connectionName": "shared_sharepointonline",
+                        "operationId": "PatchItem",
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                      },
+                      "parameters": {
+                        "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                        "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                        "id": "@outputs('Get_item')?['body/ID']",
+                        "item/BusinessLeader/Value": "@items('Apply_to_each_4')?['responder/displayName']",
+                        "item/BusinessLeaderSignatory": "@items('Apply_to_each_4')?['responder/displayName']",
+                        "item/field_10": "@items('Apply_to_each_4')?['comments']",
+                        "item/BusinessLeaderApprovalDate": "@outputs('Start_and_wait_for_an_approval_(Business_Leader)')?['body/completionDate']",
+                        "item/Sign_x002d_off_x0020_status": "Business Leader Rejected",
+                        "item/EmergencyRequest_x003f_": false,
+                        "item/Scanning": false,
+                        "item/Courier": false
+                      },
+                      "authentication": "@parameters('$authentication')"
+                    }
+                  }
+                },
+                "runAfter": {
+                  "Apply_to_each_5": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "67a57371-e199-4599-aec9-fa3343aa75e5"
+                },
+                "type": "Foreach"
+              },
+              "Apply_to_each_5": {
+                "foreach": "@outputs('Start_and_wait_for_an_approval_(Business_Leader)')?['body/responses']",
+                "actions": {
+                  "Send_an_email_(V2)_3": {
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "653eb313-dec0-4e41-abe1-1c7bb18dc5fa"
+                    },
+                    "type": "OpenApiConnection",
+                    "inputs": {
+                      "host": {
+                        "connectionName": "shared_office365",
+                        "operationId": "SendEmailV2",
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+                      },
+                      "parameters": {
+                        "emailMessage/To": "@outputs('Get_item')?['body/EmailofNHGemployee']",
+                        "emailMessage/Subject": "Document Sealing: Your request to seal @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} has been Rejected",
+                        "emailMessage/Body": "<p>Hi @{triggerOutputs()?['body/field_2']},<br>\n<br>\nYour request to seal document @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} has been rejected.<br>\n@{items('Apply_to_each_5')?['comments']}<br>\n<br>\nRegards,<br>\n<br>\n@{items('Apply_to_each_5')?['responder/displayName']}</p>",
+                        "emailMessage/From": "no-reply-documentsealing@nhg.org.uk",
+                        "emailMessage/Importance": "Normal"
+                      },
+                      "authentication": "@parameters('$authentication')"
+                    }
+                  }
+                },
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "bb72f891-3627-4ca5-8d96-309ab57a4fac"
+                },
+                "type": "Foreach"
+              },
+              "Terminate_3": {
+                "runAfter": {
+                  "Apply_to_each_4": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "08ab55ce-9194-4499-901d-404e4e1205bb"
+                },
+                "type": "Terminate",
+                "inputs": {
+                  "runStatus": "Succeeded"
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@outputs('Start_and_wait_for_an_approval_(Business_Leader)')?['body/outcome']",
+              "Approve"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d3e93722-150b-4e5a-886f-634d4e2cb219"
+          },
+          "type": "If"
+        },
+        "Get_item_2": {
+          "runAfter": {
+            "Condition_-_Business_Leader_Approval": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c4945cce-0aeb-4cc7-9a76-7f20ace10ea0"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+              "id": "@triggerOutputs()?['body/ID']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Get_attachments_2": {
+          "runAfter": {
+            "Get_item_2": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0ba944a0-05dd-46fb-9448-d9c132c7a5aa"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItemAttachments",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+              "itemId": "@triggerOutputs()?['body/ID']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Initialize_variable_2": {
+          "runAfter": {
+            "Get_attachments_2": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "84537592-e878-4981-95e0-ab13134b78ad"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Attachments",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Apply_to_each_3": {
+          "foreach": "@body('Get_attachments')",
+          "actions": {
+            "Get_attachment_content_2": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "fe692112-afde-4ea9-ad12-ae65f6d87619"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetAttachmentContent",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                  "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                  "itemId": "@triggerOutputs()?['body/ID']",
+                  "attachmentId": "@item()?['Id']"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Append_to_array_variable_2": {
+              "runAfter": {
+                "Get_attachment_content_2": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "0413c873-0d06-43cc-b1d0-f995f7263ab2"
+              },
+              "type": "AppendToArrayVariable",
+              "inputs": {
+                "name": "Attachments",
+                "value": {
+                  "Name": "@item()?['DisplayName']",
+                  "ContentBytes": "@body('Get_attachment_content_2')"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_variable_2": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "4761c445-8943-45a6-b6e5-e2372106ed63"
+          },
+          "type": "Foreach"
+        },
+        "Start_and_wait_for_an_approval_(Business_Leader)": {
+          "runAfter": {
+            "Send_an_email_(V2)_6": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "9075a424-5978-4749-ae7e-5a03df96b9bc"
+          },
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_approvals",
+              "operationId": "StartAndWaitForAnApproval",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals"
+            },
+            "parameters": {
+              "approvalType": "Basic",
+              "WebhookApprovalCreationInput/title": "Document Sealing: Business Leader Approval Required for: @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}",
+              "WebhookApprovalCreationInput/assignedTo": "@{triggerOutputs()?['body/BusinessLeader/Value']};",
+              "WebhookApprovalCreationInput/details": "### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/EmailofNHGemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item')?['body/TransactionType']}.\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+              "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+              "WebhookApprovalCreationInput/enableNotifications": true,
+              "WebhookApprovalCreationInput/enableReassignment": false,
+              "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Apply_to_each_8": {
+          "foreach": "@outputs('Get_item')?['body/field_3']",
+          "actions": {
+            "Compose": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "4e763f56-afe8-4156-a2c1-c47b222c4cf7"
+              },
+              "type": "Compose",
+              "inputs": "@items('Apply_to_each_8')?['Value']"
+            }
+          },
+          "runAfter": {
+            "Apply_to_each": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5cf97cff-2280-4c60-87d3-2d9e1be698dd"
+          },
+          "type": "Foreach"
+        },
+        "Apply_to_each_9": {
+          "foreach": "@outputs('Get_item')?['body/field_6']",
+          "actions": {
+            "Compose_2": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "e1d47f8e-7367-4852-9ce4-4c9ea99b12bd"
+              },
+              "type": "Compose",
+              "inputs": "@items('Apply_to_each_9')?['Value']"
+            }
+          },
+          "runAfter": {
+            "Apply_to_each_8": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "8145a64c-677c-4b47-a617-965444b54018"
+          },
+          "type": "Foreach"
+        },
+        "Start_and_wait_for_an_approval_4_(Governance_Team)": {
+          "runAfter": {
+            "Apply_to_each_3": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "30f43fe7-00ba-4f5e-a6c7-9d39da2425f3"
+          },
+          "type": "OpenApiConnectionWebhook",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_approvals",
+              "operationId": "StartAndWaitForAnApproval",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals"
+            },
+            "parameters": {
+              "approvalType": "CustomResponse",
+              "WebhookApprovalCreationInput/responseOptions": [
+                "Approve",
+                "Reject",
+                "Approve and Assign to TLT"
+              ],
+              "WebhookApprovalCreationInput/title": "Governance Team: Document Sealing @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} requires approval",
+              "WebhookApprovalCreationInput/assignedTo": "Jessica.DentRimmer@nhg.org.uk; Wilma.Bonazza@nhg.org.uk; Beverley.Sandal@nhg.org.uk; Lydia.Kelly@nhg.org.uk; Tumello.Mloyi@nhg.org.uk; \nJohanna.VandeVen@nhg.org.uk; kuda.musara@nhg.org.uk;\n",
+              "WebhookApprovalCreationInput/details": ".Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/EmailofNHGemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item_2')?['body/TransactionType']}\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+              "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+              "WebhookApprovalCreationInput/enableNotifications": true,
+              "WebhookApprovalCreationInput/enableReassignment": false,
+              "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Condition_-_TLT_Handoff": {
+          "actions": {
+            "Apply_to_each_10": {
+              "foreach": "@outputs('Start_and_wait_for_an_approval_4_(Governance_Team)')?['body/responses']",
+              "actions": {
+                "Update_item_7": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "1292b6d7-2953-4ccb-b34f-0e0691fe6c87"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                      "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                      "id": "@triggerOutputs()?['body/ID']",
+                      "item/GovernanceTeamSignatory": "@items('Apply_to_each_10')?['responder/displayName']",
+                      "item/Comments_x0028_GovernanceTeam_x0": "@items('Apply_to_each_10')?['comments']",
+                      "item/field_11": "@outputs('Start_and_wait_for_an_approval_4_(Governance_Team)')?['body/completionDate']",
+                      "item/Sign_x002d_off_x0020_status": "Approved by Governance Team",
+                      "item/HandofftoTLT": "Yes",
+                      "item/EmergencyRequest_x003f_": false,
+                      "item/Confidential_x003f_": false,
+                      "item/Scanning": false,
+                      "item/Courier": false,
+                      "item/Sendbypost": false
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                }
+              },
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "35eede54-e01c-43fb-a2f3-0faa90156df5"
+              },
+              "type": "Foreach"
+            },
+            "Start_and_wait_for_an_approval_-_TLT": {
+              "runAfter": {
+                "Apply_to_each_10": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "c422fee6-9ae5-495c-b7be-8cb1b4d4ba4b"
+              },
+              "type": "OpenApiConnectionWebhook",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_approvals",
+                  "operationId": "StartAndWaitForAnApproval",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals"
+                },
+                "parameters": {
+                  "approvalType": "CustomResponse",
+                  "WebhookApprovalCreationInput/responseOptions": [
+                    "Approve",
+                    "On Hold"
+                  ],
+                  "WebhookApprovalCreationInput/title": "Treasury & Legal Team - Document Sealing: @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} requires your approval",
+                  "WebhookApprovalCreationInput/assignedTo": "Lauren.Higgins@nhg.org.uk; Shipa.Begum@nhg.org.uk; Zafiirah.Mohungoo@nhg.org.uk; Dean.Atkins@nhg.org.uk\n",
+                  "WebhookApprovalCreationInput/details": ".### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/EmailofNHGemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item_2')?['body/TransactionType']}\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+                  "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+                  "WebhookApprovalCreationInput/enableNotifications": true,
+                  "WebhookApprovalCreationInput/enableReassignment": false,
+                  "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Condition_2": {
+              "actions": {
+                "Start_and_wait_for_an_approval_-_After_On_Hold": {
+                  "runAfter": {
+                    "Apply_to_each_12": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "9a1f0dbf-5253-485e-b13a-78da3fbd7846"
+                  },
+                  "type": "OpenApiConnectionWebhook",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_approvals",
+                      "operationId": "StartAndWaitForAnApproval",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals"
+                    },
+                    "parameters": {
+                      "approvalType": "CustomResponse",
+                      "WebhookApprovalCreationInput/responseOptions": [
+                        "Approve"
+                      ],
+                      "WebhookApprovalCreationInput/title": "Treasury & Legal Team - Document Sealing: @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} requires your approval following On Hold status",
+                      "WebhookApprovalCreationInput/assignedTo": "Lauren.Higgins@nhg.org.uk; Shipa.Begum@nhg.org.uk; Zafiirah.Mohungoo@nhg.org.uk; Dean.Atkins@nhg.org.uk",
+                      "WebhookApprovalCreationInput/details": "### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/EmailofNHGemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+                      "WebhookApprovalCreationInput/requestor": "@{triggerOutputs()?['body/EmailofNHGemployee']};",
+                      "WebhookApprovalCreationInput/enableNotifications": true,
+                      "WebhookApprovalCreationInput/enableReassignment": true,
+                      "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                },
+                "Apply_to_each_12": {
+                  "foreach": "@outputs('Start_and_wait_for_an_approval_-_TLT')?['body/responses']",
+                  "actions": {
+                    "Update_item_9": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "12ffe14a-db3e-4196-8ec4-eeeddbec6393"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "PatchItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                          "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                          "id": "@outputs('Get_item_2')?['body/ID']",
+                          "item/TLTSignatory": "@items('Apply_to_each_12')?['responder/displayName']",
+                          "item/TLTComments": "@items('Apply_to_each_12')?['comments']",
+                          "item/DateApprovedbyTLT": "@outputs('Start_and_wait_for_an_approval_-_TLT')?['body/completionDate']",
+                          "item/TLTEmailAddress/Value": "TLT@nhg.org.uk",
+                          "item/TLTOutcome": "On Hold",
+                          "item/Sign_x002d_off_x0020_status": "TLT Sign-off",
+                          "item/ReportableDisposal/Value": "None",
+                          "item/HandofftoTLT": "Yes",
+                          "item/EmergencyRequest_x003f_": false,
+                          "item/Confidential_x003f_": false,
+                          "item/Scanning": false,
+                          "item/Courier": false,
+                          "item/Sendbypost": false
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "cb52d6e6-610b-4824-9d44-707b745585b2"
+                  },
+                  "type": "Foreach"
+                },
+                "Apply_to_each_15": {
+                  "foreach": "@outputs('Start_and_wait_for_an_approval_-_After_On_Hold')?['body/responses']",
+                  "actions": {
+                    "Update_item_4": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "ba6166ff-ac6c-4346-a758-42664cb2eae2"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "PatchItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                          "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                          "id": "@triggerOutputs()?['body/ID']",
+                          "item/TLTSignatory": "@items('Apply_to_each_15')?['responder/displayName']",
+                          "item/TLTComments": "@items('Apply_to_each_15')?['comments']",
+                          "item/DateApprovedbyTLT": "@outputs('Start_and_wait_for_an_approval_-_After_On_Hold')?['body/completionDate']",
+                          "item/TLTEmailAddress/Value": "TLT@nhg.org.uk",
+                          "item/TLTOutcome": "@outputs('Start_and_wait_for_an_approval_-_After_On_Hold')?['body/outcome']",
+                          "item/ReportableDisposal/Value": "None",
+                          "item/EmergencyRequest_x003f_": false,
+                          "item/Confidential_x003f_": false,
+                          "item/Scanning": false,
+                          "item/Courier": false,
+                          "item/Sendbypost": false
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Start_and_wait_for_an_approval_-_After_On_Hold": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "3e161a7e-6181-4167-a8a1-0337107528c2"
+                  },
+                  "type": "Foreach"
+                }
+              },
+              "runAfter": {
+                "Start_and_wait_for_an_approval_-_TLT": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Apply_to_each_11": {
+                    "foreach": "@outputs('Start_and_wait_for_an_approval_-_TLT')?['body/responses']",
+                    "actions": {
+                      "Update_item_11": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "123fa911-115f-4231-b5c4-c39fe1ba9608"
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_sharepointonline",
+                            "operationId": "PatchItem",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                          },
+                          "parameters": {
+                            "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                            "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                            "id": "@triggerOutputs()?['body/ID']",
+                            "item/TLTSignatory": "@items('Apply_to_each_11')?['responder/displayName']",
+                            "item/TLTComments": "@items('Apply_to_each_11')?['comments']",
+                            "item/DateApprovedbyTLT": "@outputs('Start_and_wait_for_an_approval_-_TLT')?['body/completionDate']",
+                            "item/TLTEmailAddress/Value": "TLT@nhg.org.uk",
+                            "item/TLTOutcome": "Approve",
+                            "item/ReportableDisposal/Value": "None",
+                            "item/EmergencyRequest_x003f_": false,
+                            "item/Confidential_x003f_": false,
+                            "item/Scanning": false,
+                            "item/Courier": false,
+                            "item/Sendbypost": false
+                          },
+                          "authentication": "@parameters('$authentication')"
+                        }
+                      },
+                      "Send_an_email_(V2)_2": {
+                        "runAfter": {
+                          "Update_item_11": [
+                            "Succeeded"
+                          ]
+                        },
+                        "metadata": {
+                          "operationMetadataId": "50feed26-49b8-4c06-ac68-2770ea8f589b"
+                        },
+                        "type": "OpenApiConnection",
+                        "inputs": {
+                          "host": {
+                            "connectionName": "shared_office365",
+                            "operationId": "SendEmailV2",
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+                          },
+                          "parameters": {
+                            "emailMessage/To": "@triggerOutputs()?['body/EmailofNHGemployee']",
+                            "emailMessage/Subject": "Document Sealing: Your submission @{outputs('Get_item_2')?['body/Ref_x0020_No_x0020_3']}",
+                            "emailMessage/Body": "<p>Hi @{triggerOutputs()?['body/field_2']},<br>\n<br>\nRegarding your request to seal @{triggerOutputs()?['body/ID']}, please find the following outcome of your request: @{outputs('Start_and_wait_for_an_approval_-_TLT')?['body/outcome']}<br>\n<br>\nAlong with the following comments:<br>\n<br>\n@{items('Apply_to_each_11')?['comments']}<br>\n<br>\nTreasury Legal Team</p>",
+                            "emailMessage/From": "no-reply-documentsealing@nhg.org.uk",
+                            "emailMessage/Importance": "Normal"
+                          },
+                          "authentication": "@parameters('$authentication')"
+                        }
+                      }
+                    },
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "59c3098c-88b3-438a-9622-a81d83cc0d6c"
+                    },
+                    "type": "Foreach"
+                  }
+                }
+              },
+              "expression": {
+                "equals": [
+                  "@outputs('Start_and_wait_for_an_approval_-_TLT')?['body/outcome']",
+                  "On Hold"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "2d3d61f9-f9cb-4177-a526-b158a558180b"
+              },
+              "type": "If"
+            },
+            "Start_and_wait_for_an_approval_(Governance_Team_after_TLT)": {
+              "runAfter": {
+                "Condition_2": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "4f5ba1d2-8b6d-409d-9f3c-b64cf0b4e70d"
+              },
+              "type": "OpenApiConnectionWebhook",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_approvals",
+                  "operationId": "StartAndWaitForAnApproval",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals"
+                },
+                "parameters": {
+                  "approvalType": "CustomResponse",
+                  "WebhookApprovalCreationInput/responseOptions": [
+                    "Confirm courier ID to requestor and completed date"
+                  ],
+                  "WebhookApprovalCreationInput/title": "Document Sealing: Business Services @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}  Requires Action",
+                  "WebhookApprovalCreationInput/assignedTo": "Jessica.DentRimmer@nhg.org.uk; Wilma.Bonazza@nhg.org.uk; Beverley.Sandal@nhg.org.uk; Lydia.Kelly@nhg.org.uk; Tumello.Mloyi@nhg.org.uk; \nJohanna.VandeVen@nhg.org.uk; kuda.musara@nhg.org.uk;\n",
+                  "WebhookApprovalCreationInput/details": "### This Item was previously allocated to TLT with the outcome of: @{outputs('Start_and_wait_for_an_approval_-_After_On_Hold')?['body/outcome']} (following on-hold) / @{outputs('Start_and_wait_for_an_approval_-_TLT')?['body/outcome']}\n\nGovernance team – please approve attachments and forward email to Covidsealing@nhg.org.uk once actioned by business services and confirmed this can be marked as completed by Governance team via Power BI email.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+                  "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+                  "WebhookApprovalCreationInput/enableNotifications": true,
+                  "WebhookApprovalCreationInput/enableReassignment": true,
+                  "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "runAfter": {
+            "Start_and_wait_for_an_approval_4_(Governance_Team)": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Condition": {
+                "actions": {
+                  "Update_item_6": {
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "bf8e733b-56e8-44c0-b349-2824caec335a"
+                    },
+                    "type": "OpenApiConnection",
+                    "inputs": {
+                      "host": {
+                        "connectionName": "shared_sharepointonline",
+                        "operationId": "PatchItem",
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                      },
+                      "parameters": {
+                        "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                        "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                        "id": "@triggerOutputs()?['body/ID']",
+                        "item/Sign_x002d_off_x0020_status": "Governance Team Approved",
+                        "item/EmergencyRequest_x003f_": false,
+                        "item/Confidential_x003f_": false,
+                        "item/Scanning": false,
+                        "item/Courier": false,
+                        "item/Sendbypost": false
+                      },
+                      "authentication": "@parameters('$authentication')"
+                    }
+                  }
+                },
+                "runAfter": {},
+                "else": {
+                  "actions": {
+                    "Apply_to_each_13": {
+                      "foreach": "@outputs('Start_and_wait_for_an_approval_4_(Governance_Team)')?['body/responses']",
+                      "actions": {
+                        "Apply_to_each_14": {
+                          "foreach": "@outputs('Start_and_wait_for_an_approval_4_(Governance_Team)')?['body/responses']",
+                          "actions": {
+                            "Update_item_5": {
+                              "runAfter": {},
+                              "metadata": {
+                                "operationMetadataId": "812ec4c1-b8be-4bf7-a276-13a0e516c304"
+                              },
+                              "type": "OpenApiConnection",
+                              "inputs": {
+                                "host": {
+                                  "connectionName": "shared_sharepointonline",
+                                  "operationId": "PatchItem",
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                                },
+                                "parameters": {
+                                  "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                                  "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                                  "id": "@triggerOutputs()?['body/ID']",
+                                  "item/GovernanceTeamSignatory": "@items('Apply_to_each_14')?['responder/displayName']",
+                                  "item/Comments_x0028_GovernanceTeam_x0": "@items('Apply_to_each_14')?['comments']",
+                                  "item/field_11": "@outputs('Start_and_wait_for_an_approval_4_(Governance_Team)')?['body/completionDate']",
+                                  "item/Sign_x002d_off_x0020_status": "Rejected by Governance Team",
+                                  "item/EmergencyRequest_x003f_": false,
+                                  "item/Confidential_x003f_": false,
+                                  "item/Scanning": false,
+                                  "item/Courier": false,
+                                  "item/Sendbypost": false
+                                },
+                                "authentication": "@parameters('$authentication')"
+                              }
+                            }
+                          },
+                          "runAfter": {},
+                          "metadata": {
+                            "operationMetadataId": "c374fd2b-bd74-4102-a851-f9cfcaa5daa6"
+                          },
+                          "type": "Foreach"
+                        },
+                        "Send_an_email_(V2)": {
+                          "runAfter": {
+                            "Apply_to_each_14": [
+                              "Succeeded"
+                            ]
+                          },
+                          "metadata": {
+                            "operationMetadataId": "19883b60-53d9-4d4b-b594-f0b4c8962ede"
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_office365",
+                              "operationId": "SendEmailV2",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+                            },
+                            "parameters": {
+                              "emailMessage/To": "@triggerOutputs()?['body/EmailofNHGemployee']",
+                              "emailMessage/Subject": "Document Sealing: Your request to seal @{triggerOutputs()?['body/ID']} has been rejected.",
+                              "emailMessage/Body": "<p>Hi @{triggerOutputs()?['body/field_2']},<br>\n<br>\nYour request to seal document @{triggerOutputs()?['body/ID']} has been rejected.<br>\n@{items('Apply_to_each_13')?['comments']}<br>\n<br>\n@{items('Apply_to_each_13')?['responder/displayName']}</p>",
+                              "emailMessage/From": "no-reply-documentsealing@nhg.org.uk",
+                              "emailMessage/Importance": "Normal"
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        },
+                        "Update_item_8": {
+                          "runAfter": {
+                            "Send_an_email_(V2)": [
+                              "Succeeded"
+                            ]
+                          },
+                          "metadata": {
+                            "operationMetadataId": "d1bbb9dc-add3-4b51-8db5-46003acedd3c"
+                          },
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "host": {
+                              "connectionName": "shared_sharepointonline",
+                              "operationId": "PatchItem",
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                            },
+                            "parameters": {
+                              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                              "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                              "id": "@triggerOutputs()?['body/ID']",
+                              "item/Sign_x002d_off_x0020_status": "Rejected by Governance Team",
+                              "item/EmergencyRequest_x003f_": false,
+                              "item/Confidential_x003f_": false,
+                              "item/Scanning": false,
+                              "item/Courier": false,
+                              "item/Sendbypost": false
+                            },
+                            "authentication": "@parameters('$authentication')"
+                          }
+                        }
+                      },
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "501bce27-bc88-443b-96d8-05ec23edd7c3"
+                      },
+                      "type": "Foreach"
+                    },
+                    "Terminate_2": {
+                      "runAfter": {
+                        "Apply_to_each_13": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "5f769f14-2adc-4b81-9df7-818fc089e099"
+                      },
+                      "type": "Terminate",
+                      "inputs": {
+                        "runStatus": "Succeeded"
+                      }
+                    }
+                  }
+                },
+                "expression": {
+                  "equals": [
+                    "@outputs('Start_and_wait_for_an_approval_4_(Governance_Team)')?['body/outcome']",
+                    "Approve"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "ddd367a5-e51b-40f9-b22f-66205f55f99e"
+                },
+                "type": "If"
+              },
+              "Start_and_wait_for_an_approval_2_(Governance_to_Business_Services)": {
+                "runAfter": {
+                  "Condition": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "4db2bdc3-c2a2-4038-ae08-709908c0b611"
+                },
+                "type": "OpenApiConnectionWebhook",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_approvals",
+                    "operationId": "StartAndWaitForAnApproval",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals"
+                  },
+                  "parameters": {
+                    "approvalType": "CustomResponse",
+                    "WebhookApprovalCreationInput/responseOptions": [
+                      "Confirm courier ID to requestor and completed date"
+                    ],
+                    "WebhookApprovalCreationInput/title": "Document Sealing: Business Services @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}  Requires Action",
+                    "WebhookApprovalCreationInput/assignedTo": "Jessica.DentRimmer@nhg.org.uk; Wilma.Bonazza@nhg.org.uk; Beverley.Sandal@nhg.org.uk; Lydia.Kelly@nhg.org.uk; Tumello.Mloyi@nhg.org.uk; Johanna.VandeVen@nhg.org.uk; kuda.musara@nhg.org.uk;\n",
+                    "WebhookApprovalCreationInput/details": "Governance team – please approve attachments and forward email to Covidsealing@nhg.org.uk once actioned by business services and confirmed this can be marked as completed by Governance team via Power BI email.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} \n",
+                    "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+                    "WebhookApprovalCreationInput/enableNotifications": true,
+                    "WebhookApprovalCreationInput/enableReassignment": true,
+                    "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@outputs('Start_and_wait_for_an_approval_4_(Governance_Team)')?['body/outcome']",
+              "Approve and Assign to TLT"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "84257245-7777-4d06-86ca-87ebfac5ee3e"
+          },
+          "type": "If"
+        },
+        "Send_an_email_(V2)_6": {
+          "runAfter": {
+            "Apply_to_each_9": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a10cb994-835a-4eb8-8a72-1d61b6fc5c46"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365"
+            },
+            "parameters": {
+              "emailMessage/To": "@triggerOutputs()?['body/EmailofNHGemployee']",
+              "emailMessage/Subject": "Document Sealing: Your request to seal @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} has been submitted for approval.",
+              "emailMessage/Body": "<p><strong>Document Sealing Request.<br>\n<br>\n</strong><span style=\"font-size: 10px\"><strong>ID: </strong></span><span style=\"font-size: 10px\"><strong>@{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}</strong></span><span style=\"font-size: 10px\"><strong></strong></span><strong><br>\n</strong><span style=\"font-size: 10px\"><strong>Name:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_2']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Email:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/EmailofNHGemployee']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Date:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_1']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Document Types:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Compose')}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Address:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_4']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Entities:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Compose_2')}</span><span style=\"font-size: 10px\"> .<br>\n</span><span style=\"font-size: 10px\"><strong>Parties:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_5']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Leader:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/BusinessLeader/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Disposal:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Get_item')?['body/Disposals/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Reportable Disposable:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Get_item')?['body/ReportableDisposal/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Transaction Type: </strong></span><span style=\"font-size: 10px\"><strong>@{outputs('Get_item')?['body/TransactionType']}</strong></span><span style=\"font-size: 10px\"><strong>.</strong></span><span style=\"font-size: 10px\"><br>\n</span><span style=\"font-size: 10px\"><strong>Other information: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Reasonforemergencyrequest']}</span><span style=\"font-size: 10px\"></span><br>\n<br>\n<strong>Instructions to Business Services.<br>\n</strong><br>\n<span style=\"font-size: 10px\"><strong>Cost Centre:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Name:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/BusinessNameandAddress']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Tel. No: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Businessphonenumber']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>How to Send: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/HowtoSend/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Postal Address:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/PostalAddress']}</span><span style=\"font-size: 10px\"><br>\nRegards,<br>\n<br>\nGovernance Team</span></p>",
+              "emailMessage/From": "no-reply-documentsealing@nhg.org.uk",
+              "emailMessage/ReplyTo": "GTeam@nhg.org.uk",
+              "emailMessage/Importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Update_item_3": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "f7e068b6-88be-4f3c-9d68-2671195e1af9"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "PatchItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+              "id": "@triggerOutputs()?['body/ID']",
+              "item/Sign_x002d_off_x0020_status": "Pending",
+              "item/IDCopy2": "@triggerOutputs()?['body/ID']",
+              "item/EmergencyRequest_x003f_": false,
+              "item/Confidential_x003f_": false,
+              "item/Scanning": false,
+              "item/Courier": false,
+              "item/DateCopy": "@triggerOutputs()?['body/field_1']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Update_item_-_Sealing_Request_Completed": {
+          "runAfter": {
+            "Apply_to_each_6": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a3af5927-682c-4cf4-965c-67a2bf570424"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "PatchItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+              "id": "@triggerOutputs()?['body/ID']",
+              "item/Sign_x002d_off_x0020_status": "Sealing Request Completed",
+              "item/DateApproved": "@outputs('Start_and_wait_for_an_approval_2_(Governance_to_Business_Services)')?['body/completionDate']",
+              "item/EmergencyRequest_x003f_": false,
+              "item/Confidential_x003f_": false,
+              "item/Scanning": false,
+              "item/Courier": false,
+              "item/Sendbypost": false
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Apply_to_each_6": {
+          "foreach": "@outputs('Start_and_wait_for_an_approval_2_(Governance_to_Business_Services)')?['body/responses']",
+          "actions": {
+            "Apply_to_each_7": {
+              "foreach": "@outputs('Start_and_wait_for_an_approval_2_(Governance_to_Business_Services)')?['body/responses']",
+              "actions": {
+                "Update_item_10": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "eece811b-95d5-4c21-82cb-a3e8b6e12723"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                      "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
+                      "id": "@outputs('Get_item')?['body/ID']",
+                      "item/field_13": "@outputs('Start_and_wait_for_an_approval_2_(Governance_to_Business_Services)')?['body/completionDate']",
+                      "item/Tracking_x002f_CourierReferenceN": "@items('Apply_to_each_7')?['comments']",
+                      "item/Sign_x002d_off_x0020_status": "Processed by Business Services",
+                      "item/EmergencyRequest_x003f_": false,
+                      "item/Confidential_x003f_": false,
+                      "item/Scanning": false,
+                      "item/Courier": false,
+                      "item/Sendbypost": false
+                    },
+                    "authentication": "@parameters('$authentication')"
+                  }
+                }
+              },
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "082b487f-8290-4dd3-952e-4b7a668b7752"
+              },
+              "type": "Foreach"
+            }
+          },
+          "runAfter": {
+            "Condition_-_TLT_Handoff": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d7251017-4d07-460e-8a20-1866d0ee309c"
+          },
+          "type": "Foreach"
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

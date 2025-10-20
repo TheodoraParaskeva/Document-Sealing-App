@@ -1,0 +1,115 @@
+<ImportExportXml version="9.2.25093.154" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25093.154" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.25093.00154">
+  <SolutionManifest>
+    <UniqueName>SealingApplicationProduction</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="Sealing Application - Production" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions />
+    <Version>1.0.0.9</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>Notting_Hill_Genesis</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="NottingHill Genesis" languagecode="1033" />
+      </LocalizedNames>
+      <Descriptions />
+      <EMailAddress xsi:nil="true"></EMailAddress>
+      <SupportingWebsiteUrl xsi:nil="true"></SupportingWebsiteUrl>
+      <CustomizationPrefix>crm</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>77006</CustomizationOptionValuePrefix>
+      <Addresses>
+        <Address>
+          <AddressNumber>1</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+          <City xsi:nil="true"></City>
+          <County xsi:nil="true"></County>
+          <Country xsi:nil="true"></Country>
+          <Fax xsi:nil="true"></Fax>
+          <FreightTermsCode xsi:nil="true"></FreightTermsCode>
+          <ImportSequenceNumber xsi:nil="true"></ImportSequenceNumber>
+          <Latitude xsi:nil="true"></Latitude>
+          <Line1 xsi:nil="true"></Line1>
+          <Line2 xsi:nil="true"></Line2>
+          <Line3 xsi:nil="true"></Line3>
+          <Longitude xsi:nil="true"></Longitude>
+          <Name xsi:nil="true"></Name>
+          <PostalCode xsi:nil="true"></PostalCode>
+          <PostOfficeBox xsi:nil="true"></PostOfficeBox>
+          <PrimaryContactName xsi:nil="true"></PrimaryContactName>
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince xsi:nil="true"></StateOrProvince>
+          <Telephone1 xsi:nil="true"></Telephone1>
+          <Telephone2 xsi:nil="true"></Telephone2>
+          <Telephone3 xsi:nil="true"></Telephone3>
+          <TimeZoneRuleVersionNumber xsi:nil="true"></TimeZoneRuleVersionNumber>
+          <UPSZone xsi:nil="true"></UPSZone>
+          <UTCOffset xsi:nil="true"></UTCOffset>
+          <UTCConversionTimeZoneCode xsi:nil="true"></UTCConversionTimeZoneCode>
+        </Address>
+        <Address>
+          <AddressNumber>2</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+          <City xsi:nil="true"></City>
+          <County xsi:nil="true"></County>
+          <Country xsi:nil="true"></Country>
+          <Fax xsi:nil="true"></Fax>
+          <FreightTermsCode xsi:nil="true"></FreightTermsCode>
+          <ImportSequenceNumber xsi:nil="true"></ImportSequenceNumber>
+          <Latitude xsi:nil="true"></Latitude>
+          <Line1 xsi:nil="true"></Line1>
+          <Line2 xsi:nil="true"></Line2>
+          <Line3 xsi:nil="true"></Line3>
+          <Longitude xsi:nil="true"></Longitude>
+          <Name xsi:nil="true"></Name>
+          <PostalCode xsi:nil="true"></PostalCode>
+          <PostOfficeBox xsi:nil="true"></PostOfficeBox>
+          <PrimaryContactName xsi:nil="true"></PrimaryContactName>
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince xsi:nil="true"></StateOrProvince>
+          <Telephone1 xsi:nil="true"></Telephone1>
+          <Telephone2 xsi:nil="true"></Telephone2>
+          <Telephone3 xsi:nil="true"></Telephone3>
+          <TimeZoneRuleVersionNumber xsi:nil="true"></TimeZoneRuleVersionNumber>
+          <UPSZone xsi:nil="true"></UPSZone>
+          <UTCOffset xsi:nil="true"></UTCOffset>
+          <UTCConversionTimeZoneCode xsi:nil="true"></UTCConversionTimeZoneCode>
+        </Address>
+      </Addresses>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="29" id="{667d7993-bb25-f011-8c4d-000d3ab54e72}" behavior="0" />
+      <RootComponent type="29" id="{e7df96ed-4109-ef11-9f89-000d3a68beef}" behavior="0" />
+      <RootComponent type="300" schemaName="crm_documentsealingapplicationcopy_2df79" behavior="0" />
+    </RootComponents>
+    <MissingDependencies>
+      <MissingDependency>
+        <Required type="300" schemaName="crdf3_powerappslibraryv03_63d8b" displayName="PowerApps Library v03" solution="Active" />
+        <Dependent type="300" schemaName="crm_documentsealingapplicationcopy_2df79" displayName="Document Sealing Application V1 Prod" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="connectionreference" displayName="crm_sharedapprovals_5632b" solution="Active" id.connectionreferencelogicalname="crm_sharedapprovals_5632b" />
+        <Dependent type="29" displayName="Document Sealing Application - Cloud Flow" id="{e7df96ed-4109-ef11-9f89-000d3a68beef}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="connectionreference" displayName="crm_sharedoffice365_83c40" solution="Active" id.connectionreferencelogicalname="crm_sharedoffice365_83c40" />
+        <Dependent type="29" displayName="Document Sealing Application - Cloud Flow" id="{e7df96ed-4109-ef11-9f89-000d3a68beef}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="connectionreference" displayName="crm_sharedsharepointonline_6be08" solution="Active" id.connectionreferencelogicalname="crm_sharedsharepointonline_6be08" />
+        <Dependent type="29" displayName="Document Sealing Application - Cloud Flow" id="{e7df96ed-4109-ef11-9f89-000d3a68beef}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="connectionreference" displayName="new_sharedapprovals_e02bd" solution="Active" id.connectionreferencelogicalname="new_sharedapprovals_e02bd" />
+        <Dependent type="29" displayName="Copy of - Document Sealing Application - Cloud Flow" id="{667d7993-bb25-f011-8c4d-000d3ab54e72}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="connectionreference" displayName="new_sharedoffice365_764c8" solution="Active" id.connectionreferencelogicalname="new_sharedoffice365_764c8" />
+        <Dependent type="29" displayName="Copy of - Document Sealing Application - Cloud Flow" id="{667d7993-bb25-f011-8c4d-000d3ab54e72}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="connectionreference" displayName="new_sharedsharepointonline_3c5b9" solution="Active" id.connectionreferencelogicalname="new_sharedsharepointonline_3c5b9" />
+        <Dependent type="29" displayName="Copy of - Document Sealing Application - Cloud Flow" id="{667d7993-bb25-f011-8c4d-000d3ab54e72}" />
+      </MissingDependency>
+    </MissingDependencies>
+  </SolutionManifest>
+</ImportExportXml>

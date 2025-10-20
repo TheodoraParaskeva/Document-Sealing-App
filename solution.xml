@@ -8,9 +8,9 @@
     <Version>1.0.0.9</Version>
     <Managed>0</Managed>
     <Publisher>
-      <UniqueName>Notting_Hill_Genesis</UniqueName>
+      <UniqueName>Test</UniqueName>
       <LocalizedNames>
-        <LocalizedName description="NottingHill Genesis" languagecode="1033" />
+        <LocalizedName description="NTest" languagecode="1033" />
       </LocalizedNames>
       <Descriptions />
       <EMailAddress xsi:nil="true"></EMailAddress>
@@ -112,4 +112,5 @@
       </MissingDependency>
     </MissingDependencies>
   </SolutionManifest>
+
 </ImportExportXml>

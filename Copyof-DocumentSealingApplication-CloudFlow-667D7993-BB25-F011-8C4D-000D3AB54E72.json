@@ -60,7 +60,7 @@
               "operationId": "GetOnNewItems"
             },
             "parameters": {
-              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "dataset": "https://test.sharepoint.com",
               "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2"
             },
             "authentication": "@parameters('$authentication')"
@@ -85,7 +85,7 @@
               "operationId": "GetItem"
             },
             "parameters": {
-              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "dataset": "https://test.sharepoint.com",
               "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
               "id": "@triggerOutputs()?['body/ID']"
             },
@@ -109,7 +109,7 @@
               "operationId": "GetItemAttachments"
             },
             "parameters": {
-              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "dataset": "https://test.sharepoint.com",
               "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
               "itemId": "@outputs('Get_item')?['body/ID']"
             },
@@ -132,7 +132,7 @@
                   "operationId": "GetAttachmentContent"
                 },
                 "parameters": {
-                  "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                  "dataset": "https://test.sharepoint.com",
                   "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                   "itemId": "@triggerOutputs()?['body/ID']",
                   "attachmentId": "@item()?['Id']"
@@ -220,7 +220,7 @@
                       "operationId": "PatchItem"
                     },
                     "parameters": {
-                      "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                      "dataset": "https://test.sharepoint.com",
                       "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                       "id": "@triggerOutputs()?['body/ID']",
                       "item/BusinessLeader/Value": "@items('Apply_to_each_2')?['responder/displayName']",
@@ -266,7 +266,7 @@
                         "operationId": "PatchItem"
                       },
                       "parameters": {
-                        "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                        "dataset": "https://test.sharepoint.com",
                         "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                         "id": "@outputs('Get_item')?['body/ID']",
                         "item/BusinessLeader/Value": "@items('Apply_to_each_4')?['responder/displayName']",
@@ -308,10 +308,10 @@
                         "operationId": "SendEmailV2"
                       },
                       "parameters": {
-                        "emailMessage/To": "@outputs('Get_item')?['body/EmailofNHGemployee']",
+                        "emailMessage/To": "@outputs('Get_item')?['body/Emailofemployee']",
                         "emailMessage/Subject": "Document Sealing: Your request to seal @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} has been Rejected",
                         "emailMessage/Body": "<p>Hi @{triggerOutputs()?['body/field_2']},<br>\n<br>\nYour request to seal document @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} has been rejected.<br>\n@{items('Apply_to_each_5')?['comments']}<br>\n<br>\nRegards,<br>\n<br>\n@{items('Apply_to_each_5')?['responder/displayName']}</p>",
-                        "emailMessage/From": "no-reply-documentsealing@nhg.org.uk",
+                        "emailMessage/From": "no-reply-documentsealing@test.com",
                         "emailMessage/Importance": "Normal"
                       },
                       "authentication": "@parameters('$authentication')"
@@ -368,7 +368,7 @@
               "operationId": "GetItem"
             },
             "parameters": {
-              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "dataset": "https://test.sharepoint.com",
               "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
               "id": "@triggerOutputs()?['body/ID']"
             },
@@ -392,7 +392,7 @@
               "operationId": "GetItemAttachments"
             },
             "parameters": {
-              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "dataset": "https://test.sharepoint.com",
               "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
               "itemId": "@triggerOutputs()?['body/ID']"
             },
@@ -434,7 +434,7 @@
                   "operationId": "GetAttachmentContent"
                 },
                 "parameters": {
-                  "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                  "dataset": "https://test.sharepoint.com",
                   "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                   "itemId": "@triggerOutputs()?['body/ID']",
                   "attachmentId": "@item()?['Id']"
@@ -491,8 +491,8 @@
               "approvalType": "Basic",
               "WebhookApprovalCreationInput/title": "Document Sealing: Business Leader Approval Required for: @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}",
               "WebhookApprovalCreationInput/assignedTo": "@{triggerOutputs()?['body/BusinessLeader/Value']};",
-              "WebhookApprovalCreationInput/details": "### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/EmailofNHGemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item')?['body/TransactionType']}.\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
-              "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+              "WebhookApprovalCreationInput/details": "### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/Emailofemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item')?['body/TransactionType']}.\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+              "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/Emailofemployee']};",
               "WebhookApprovalCreationInput/enableNotifications": true,
               "WebhookApprovalCreationInput/enableReassignment": false,
               "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
@@ -568,9 +568,9 @@
                 "Approve and Assign to TLT"
               ],
               "WebhookApprovalCreationInput/title": "Governance Team: Document Sealing @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} requires approval",
-              "WebhookApprovalCreationInput/assignedTo": "Jessica.DentRimmer@nhg.org.uk; Wilma.Bonazza@nhg.org.uk; Beverley.Sandal@nhg.org.uk; Lydia.Kelly@nhg.org.uk; Tumello.Mloyi@nhg.org.uk; \nJohanna.VandeVen@nhg.org.uk\n",
-              "WebhookApprovalCreationInput/details": ".Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/EmailofNHGemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item_2')?['body/TransactionType']}\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
-              "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+              "WebhookApprovalCreationInput/assignedTo": "Email",
+              "WebhookApprovalCreationInput/details": ".Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/Emailofemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item_2')?['body/TransactionType']}\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+              "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/Emailofemployee']};",
               "WebhookApprovalCreationInput/enableNotifications": true,
               "WebhookApprovalCreationInput/enableReassignment": false,
               "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
@@ -596,7 +596,7 @@
                       "operationId": "PatchItem"
                     },
                     "parameters": {
-                      "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                      "dataset": "https://test.sharepoint.com",
                       "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                       "id": "@triggerOutputs()?['body/ID']",
                       "item/GovernanceTeamSignatory": "@items('Apply_to_each_10')?['responder/displayName']",
@@ -643,9 +643,9 @@
                     "On Hold"
                   ],
                   "WebhookApprovalCreationInput/title": "Treasury & Legal Team - Document Sealing: @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} requires your approval",
-                  "WebhookApprovalCreationInput/assignedTo": "Lauren.Higgins@nhg.org.uk; Shipa.Begum@nhg.org.uk; Zafiirah.Mohungoo@nhg.org.uk; Dean.Atkins@nhg.org.uk\n",
-                  "WebhookApprovalCreationInput/details": ".### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/EmailofNHGemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item_2')?['body/TransactionType']}\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
-                  "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+                  "WebhookApprovalCreationInput/assignedTo": "Email",
+                  "WebhookApprovalCreationInput/details": ".### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/Emailofemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Transaction Type:** @{outputs('Get_item_2')?['body/TransactionType']}\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+                  "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/Emailofemployee']};",
                   "WebhookApprovalCreationInput/enableNotifications": true,
                   "WebhookApprovalCreationInput/enableReassignment": false,
                   "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
@@ -677,9 +677,9 @@
                         "Approve"
                       ],
                       "WebhookApprovalCreationInput/title": "Treasury & Legal Team - Document Sealing: @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} requires your approval following On Hold status",
-                      "WebhookApprovalCreationInput/assignedTo": "Lauren.Higgins@nhg.org.uk; Shipa.Begum@nhg.org.uk; Zafiirah.Mohungoo@nhg.org.uk; Dean.Atkins@nhg.org.uk",
-                      "WebhookApprovalCreationInput/details": "### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/EmailofNHGemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
-                      "WebhookApprovalCreationInput/requestor": "@{triggerOutputs()?['body/EmailofNHGemployee']};",
+                      "WebhookApprovalCreationInput/assignedTo": "Emil",
+                      "WebhookApprovalCreationInput/details": "### Document Sealing Request. \n**Name:** @{triggerOutputs()?['body/field_2']}.\n**Email:** @{triggerOutputs()?['body/Emailofemployee']}. \n**Date:** @{triggerOutputs()?['body/field_1']}.\n**Document Types:** @{outputs('Compose')}.\n**Address:** @{triggerOutputs()?['body/field_4']}.\n**Entities:** @{outputs('Compose_2')} .\n**Parties:** @{triggerOutputs()?['body/field_5']}.\n**Business Leader:** @{triggerOutputs()?['body/BusinessLeader/Value']}.\n**Disposals:** @{outputs('Get_item')?['body/Disposals/Value']}.\n**Reportable Disposable:** @{outputs('Get_item_2')?['body/ReportableDisposal/Value']}.\n**Other information:** @{triggerOutputs()?['body/Reasonforemergencyrequest']}.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+                      "WebhookApprovalCreationInput/requestor": "@{triggerOutputs()?['body/Emailofemployee']};",
                       "WebhookApprovalCreationInput/enableNotifications": true,
                       "WebhookApprovalCreationInput/enableReassignment": true,
                       "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
@@ -703,13 +703,13 @@
                           "operationId": "PatchItem"
                         },
                         "parameters": {
-                          "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                          "dataset": "https://test.sharepoint.com",
                           "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                           "id": "@outputs('Get_item_2')?['body/ID']",
                           "item/TLTSignatory": "@items('Apply_to_each_12')?['responder/displayName']",
                           "item/TLTComments": "@items('Apply_to_each_12')?['comments']",
                           "item/DateApprovedbyTLT": "@outputs('Start_and_wait_for_an_approval_-_TLT')?['body/completionDate']",
-                          "item/TLTEmailAddress/Value": "TLT@nhg.org.uk",
+                          "item/TLTEmailAddress/Value": "Email",
                           "item/TLTOutcome": "On Hold",
                           "item/Sign_x002d_off_x0020_status": "TLT Sign-off",
                           "item/ReportableDisposal/Value": "None",
@@ -746,13 +746,13 @@
                           "operationId": "PatchItem"
                         },
                         "parameters": {
-                          "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                          "dataset": "https://test.sharepoint.com",
                           "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                           "id": "@triggerOutputs()?['body/ID']",
                           "item/TLTSignatory": "@items('Apply_to_each_15')?['responder/displayName']",
                           "item/TLTComments": "@items('Apply_to_each_15')?['comments']",
                           "item/DateApprovedbyTLT": "@outputs('Start_and_wait_for_an_approval_-_After_On_Hold')?['body/completionDate']",
-                          "item/TLTEmailAddress/Value": "TLT@nhg.org.uk",
+                          "item/TLTEmailAddress/Value": "Email",
                           "item/TLTOutcome": "@outputs('Start_and_wait_for_an_approval_-_After_On_Hold')?['body/outcome']",
                           "item/ReportableDisposal/Value": "None",
                           "item/EmergencyRequest_x003f_": false,
@@ -799,13 +799,13 @@
                             "operationId": "PatchItem"
                           },
                           "parameters": {
-                            "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                            "dataset": "https://test.sharepoint.com",
                             "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                             "id": "@triggerOutputs()?['body/ID']",
                             "item/TLTSignatory": "@items('Apply_to_each_11')?['responder/displayName']",
                             "item/TLTComments": "@items('Apply_to_each_11')?['comments']",
                             "item/DateApprovedbyTLT": "@outputs('Start_and_wait_for_an_approval_-_TLT')?['body/completionDate']",
-                            "item/TLTEmailAddress/Value": "TLT@nhg.org.uk",
+                            "item/TLTEmailAddress/Value": "Email",
                             "item/TLTOutcome": "Approve",
                             "item/ReportableDisposal/Value": "None",
                             "item/EmergencyRequest_x003f_": false,
@@ -834,10 +834,10 @@
                             "operationId": "SendEmailV2"
                           },
                           "parameters": {
-                            "emailMessage/To": "@triggerOutputs()?['body/EmailofNHGemployee']",
+                            "emailMessage/To": "@triggerOutputs()?['body/Emailofemployee']",
                             "emailMessage/Subject": "Document Sealing: Your submission @{outputs('Get_item_2')?['body/Ref_x0020_No_x0020_3']}",
                             "emailMessage/Body": "<p>Hi @{triggerOutputs()?['body/field_2']},<br>\n<br>\nRegarding your request to seal @{triggerOutputs()?['body/ID']}, please find the following outcome of your request: @{outputs('Start_and_wait_for_an_approval_-_TLT')?['body/outcome']}<br>\n<br>\nAlong with the following comments:<br>\n<br>\n@{items('Apply_to_each_11')?['comments']}<br>\n<br>\nTreasury Legal Team</p>",
-                            "emailMessage/From": "no-reply-documentsealing@nhg.org.uk",
+                            "emailMessage/From": "Email",
                             "emailMessage/Importance": "Normal"
                           },
                           "authentication": "@parameters('$authentication')"
@@ -885,9 +885,9 @@
                     "Confirm courier ID to requestor and completed date"
                   ],
                   "WebhookApprovalCreationInput/title": "Document Sealing: Business Services @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}  Requires Action",
-                  "WebhookApprovalCreationInput/assignedTo": "Jessica.DentRimmer@nhg.org.uk; Wilma.Bonazza@nhg.org.uk; Beverley.Sandal@nhg.org.uk; Lydia.Kelly@nhg.org.uk; Tumello.Mloyi@nhg.org.uk; \nJohanna.VandeVen@nhg.org.uk\n",
-                  "WebhookApprovalCreationInput/details": "### This Item was previously allocated to TLT with the outcome of: @{outputs('Start_and_wait_for_an_approval_-_After_On_Hold')?['body/outcome']} (following on-hold) / @{outputs('Start_and_wait_for_an_approval_-_TLT')?['body/outcome']}\n\nGovernance team – please approve attachments and forward email to Covidsealing@nhg.org.uk once actioned by business services and confirmed this can be marked as completed by Governance team via Power BI email.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
-                  "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+                  "WebhookApprovalCreationInput/assignedTo": "Email",
+                  "WebhookApprovalCreationInput/details": "### This Item was previously allocated to TLT with the outcome of: @{outputs('Start_and_wait_for_an_approval_-_After_On_Hold')?['body/outcome']} (following on-hold) / @{outputs('Start_and_wait_for_an_approval_-_TLT')?['body/outcome']}\n\nGovernance team – please approve attachments and forward email once actioned by business services and confirmed this can be marked as completed by Governance team via Power BI email.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} ",
+                  "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/Emailofemployee']};",
                   "WebhookApprovalCreationInput/enableNotifications": true,
                   "WebhookApprovalCreationInput/enableReassignment": true,
                   "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
@@ -918,7 +918,7 @@
                         "operationId": "PatchItem"
                       },
                       "parameters": {
-                        "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                        "dataset": "https://test.sharepoint.com",
                         "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                         "id": "@triggerOutputs()?['body/ID']",
                         "item/Sign_x002d_off_x0020_status": "Governance Team Approved",
@@ -954,7 +954,7 @@
                                   "operationId": "PatchItem"
                                 },
                                 "parameters": {
-                                  "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                                  "dataset": "https://test.sharepoint.com",
                                   "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                                   "id": "@triggerOutputs()?['body/ID']",
                                   "item/GovernanceTeamSignatory": "@items('Apply_to_each_14')?['responder/displayName']",
@@ -994,10 +994,10 @@
                               "operationId": "SendEmailV2"
                             },
                             "parameters": {
-                              "emailMessage/To": "@triggerOutputs()?['body/EmailofNHGemployee']",
+                              "emailMessage/To": "@triggerOutputs()?['body/Emailofemployee']",
                               "emailMessage/Subject": "Document Sealing: Your request to seal @{triggerOutputs()?['body/ID']} has been rejected.",
                               "emailMessage/Body": "<p>Hi @{triggerOutputs()?['body/field_2']},<br>\n<br>\nYour request to seal document @{triggerOutputs()?['body/ID']} has been rejected.<br>\n@{items('Apply_to_each_13')?['comments']}<br>\n<br>\n@{items('Apply_to_each_13')?['responder/displayName']}</p>",
-                              "emailMessage/From": "no-reply-documentsealing@nhg.org.uk",
+                              "emailMessage/From": "Email",
                               "emailMessage/Importance": "Normal"
                             },
                             "authentication": "@parameters('$authentication')"
@@ -1020,7 +1020,7 @@
                               "operationId": "PatchItem"
                             },
                             "parameters": {
-                              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                              "dataset": "https://test.sharepoint.com",
                               "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                               "id": "@triggerOutputs()?['body/ID']",
                               "item/Sign_x002d_off_x0020_status": "Rejected by Governance Team",
@@ -1089,9 +1089,9 @@
                       "Confirm courier ID to requestor and completed date"
                     ],
                     "WebhookApprovalCreationInput/title": "Document Sealing: Business Services @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}  Requires Action",
-                    "WebhookApprovalCreationInput/assignedTo": "Jessica.DentRimmer@nhg.org.uk; Wilma.Bonazza@nhg.org.uk; Beverley.Sandal@nhg.org.uk; Lydia.Kelly@nhg.org.uk; Tumello.Mloyi@nhg.org.uk; Johanna.VandeVen@nhg.org.uk\n",
-                    "WebhookApprovalCreationInput/details": "Governance team – please approve attachments and forward email to Covidsealing@nhg.org.uk once actioned by business services and confirmed this can be marked as completed by Governance team via Power BI email.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} \n",
-                    "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/EmailofNHGemployee']};",
+                    "WebhookApprovalCreationInput/assignedTo": "Email",
+                    "WebhookApprovalCreationInput/details": "Governance team – please approve attachments and forward email to Covidsealing@test.com once actioned by business services and confirmed this can be marked as completed by Governance team via Power BI email.\n\n### Instructions to Business Services. \n**Cost Centre:** @{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}. \n**Business Name:** @{triggerOutputs()?['body/BusinessNameandAddress']}.\n**Business Tel. No:** @{triggerOutputs()?['body/Businessphonenumber']}.\n**How to Send:** @{triggerOutputs()?['body/HowtoSend/Value']}.\n**Postal Address:** @{triggerOutputs()?['body/PostalAddress']} \n",
+                    "WebhookApprovalCreationInput/requestor": "@{outputs('Get_item')?['body/Emailofemployee']};",
                     "WebhookApprovalCreationInput/enableNotifications": true,
                     "WebhookApprovalCreationInput/enableReassignment": true,
                     "WebhookApprovalCreationInput/attachments": "@variables('attachmentArray')"
@@ -1129,11 +1129,11 @@
               "operationId": "SendEmailV2"
             },
             "parameters": {
-              "emailMessage/To": "@triggerOutputs()?['body/EmailofNHGemployee']",
+              "emailMessage/To": "@triggerOutputs()?['body/Emailofemployee']",
               "emailMessage/Subject": "Document Sealing: Your request to seal @{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']} has been submitted for approval.",
-              "emailMessage/Body": "<p><strong>Document Sealing Request.<br>\n<br>\n</strong><span style=\"font-size: 10px\"><strong>ID: </strong></span><span style=\"font-size: 10px\"><strong>@{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}</strong></span><span style=\"font-size: 10px\"><strong></strong></span><strong><br>\n</strong><span style=\"font-size: 10px\"><strong>Name:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_2']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Email:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/EmailofNHGemployee']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Date:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_1']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Document Types:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Compose')}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Address:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_4']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Entities:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Compose_2')}</span><span style=\"font-size: 10px\"> .<br>\n</span><span style=\"font-size: 10px\"><strong>Parties:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_5']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Leader:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/BusinessLeader/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Disposal:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Get_item')?['body/Disposals/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Reportable Disposable:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Get_item')?['body/ReportableDisposal/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Transaction Type: </strong></span><span style=\"font-size: 10px\"><strong>@{outputs('Get_item')?['body/TransactionType']}</strong></span><span style=\"font-size: 10px\"><strong>.</strong></span><span style=\"font-size: 10px\"><br>\n</span><span style=\"font-size: 10px\"><strong>Other information: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Reasonforemergencyrequest']}</span><span style=\"font-size: 10px\"></span><br>\n<br>\n<strong>Instructions to Business Services.<br>\n</strong><br>\n<span style=\"font-size: 10px\"><strong>Cost Centre:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Name:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/BusinessNameandAddress']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Tel. No: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Businessphonenumber']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>How to Send: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/HowtoSend/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Postal Address:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/PostalAddress']}</span><span style=\"font-size: 10px\"><br>\nRegards,<br>\n<br>\nGovernance Team</span></p>",
-              "emailMessage/From": "no-reply-documentsealing@nhg.org.uk",
-              "emailMessage/ReplyTo": "GTeam@nhg.org.uk",
+              "emailMessage/Body": "<p><strong>Document Sealing Request.<br>\n<br>\n</strong><span style=\"font-size: 10px\"><strong>ID: </strong></span><span style=\"font-size: 10px\"><strong>@{outputs('Get_item')?['body/Ref_x0020_No_x0020_3']}</strong></span><span style=\"font-size: 10px\"><strong></strong></span><strong><br>\n</strong><span style=\"font-size: 10px\"><strong>Name:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_2']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Email:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Emailofemployee']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Date:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_1']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Document Types:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Compose')}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Address:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_4']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Entities:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Compose_2')}</span><span style=\"font-size: 10px\"> .<br>\n</span><span style=\"font-size: 10px\"><strong>Parties:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/field_5']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Leader:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/BusinessLeader/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Disposal:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Get_item')?['body/Disposals/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Reportable Disposable:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{outputs('Get_item')?['body/ReportableDisposal/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Transaction Type: </strong></span><span style=\"font-size: 10px\"><strong>@{outputs('Get_item')?['body/TransactionType']}</strong></span><span style=\"font-size: 10px\"><strong>.</strong></span><span style=\"font-size: 10px\"><br>\n</span><span style=\"font-size: 10px\"><strong>Other information: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Reasonforemergencyrequest']}</span><span style=\"font-size: 10px\"></span><br>\n<br>\n<strong>Instructions to Business Services.<br>\n</strong><br>\n<span style=\"font-size: 10px\"><strong>Cost Centre:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Costcentreandcode_x0028_courier_']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Name:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/BusinessNameandAddress']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Business Tel. No: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/Businessphonenumber']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>How to Send: </strong></span><span style=\"font-size: 10px\"></span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/HowtoSend/Value']}</span><span style=\"font-size: 10px\">.<br>\n</span><span style=\"font-size: 10px\"><strong>Postal Address:</strong></span><span style=\"font-size: 10px\"> </span><span style=\"font-size: 10px\">@{triggerOutputs()?['body/PostalAddress']}</span><span style=\"font-size: 10px\"><br>\nRegards,<br>\n<br>\nGovernance Team</span></p>",
+              "emailMessage/From": "no-reply-documentsealing@test.org.uk",
+              "emailMessage/ReplyTo": "GTeam@test.org.uk",
               "emailMessage/Importance": "Normal"
             },
             "authentication": "@parameters('$authentication')"
@@ -1152,7 +1152,7 @@
               "operationId": "PatchItem"
             },
             "parameters": {
-              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "dataset": "https://test.sharepoint.com",
               "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
               "id": "@triggerOutputs()?['body/ID']",
               "item/Sign_x002d_off_x0020_status": "Pending",
@@ -1183,7 +1183,7 @@
               "operationId": "PatchItem"
             },
             "parameters": {
-              "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+              "dataset": "https://test.sharepoint.com",
               "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
               "id": "@triggerOutputs()?['body/ID']",
               "item/Sign_x002d_off_x0020_status": "Sealing Request Completed",
@@ -1216,7 +1216,7 @@
                       "operationId": "PatchItem"
                     },
                     "parameters": {
-                      "dataset": "https://nottinghill.sharepoint.com/sites/DigitalDeliverySandbox",
+                      "dataset": "https://test.sharepoint.com",
                       "table": "38a6091b-402f-4efe-a6d6-e1a618c607f2",
                       "id": "@outputs('Get_item')?['body/ID']",
                       "item/field_13": "@outputs('Start_and_wait_for_an_approval_2_(Governance_to_Business_Services)')?['body/completionDate']",
@@ -1254,4 +1254,5 @@
     "templateName": null
   },
   "schemaVersion": "1.0.0.0"
+
 }
